@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        <%= title %>
+    </title>
+    <!-- Agrega tus estilos CSS aquí -->
+</head>
+
+<body>
+    <%- include('../partials/header') %>
+        <h1>
+            <%= title %>
+        </h1>
+        <div class="error-message">
+            <p><%- message %></p>
+            <!-- Ejemplo de humor: -->
+            <img src="/images/404-dinosaur.gif" alt="Funny 404 image">
+        </div>
+        <%- include('../partials/footer') %>
+</body>
+
+</html>
