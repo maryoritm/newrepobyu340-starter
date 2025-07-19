@@ -4,7 +4,7 @@ const Util = {}
 /* ************************
  * Constructs the nav HTML unordered list
  ************************** */
-Util.getNav = async function (req, res, next) {
+Util.getNav = async function () {
   let data = await invModel.getClassifications()
   let list = "<ul>"
   list += '<li><a href="/" title="Home page">Home</a></li>'
@@ -30,13 +30,6 @@ Util.getNav = async function (req, res, next) {
  * General Error Handling
  **************************************** */
 Util.handleErrors = fn => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next)
-
-
-
-module.exports = Util
-
-
-
 
 /* **************************************
 * Build the classification view HTML
@@ -70,3 +63,25 @@ Util.buildClassificationGrid = async function(data){
   }
   return grid
 }
+
+/* **************************************
+* Build the inventory detail view HTML
+* ************************************ */
+Util.buildDetailHTML = async function(data) {
+  return `
+    <div class="detail-container">
+      <div class="detail-image">
+        <img src="${data.inv_image}" alt="${data.inv_make} ${data.inv_model}">
+      </div>
+      <div class="detail-info">
+        <h2>${data.inv_year} ${data.inv_make} ${data.inv_model}</h2>
+        <p><strong>Price:</strong> $${new Intl.NumberFormat('en-US').format(data.inv_price)}</p>
+        <p><strong>Mileage:</strong> ${new Intl.NumberFormat('en-US').format(data.inv_miles)} miles</p>
+        <p><strong>Color:</strong> ${data.inv_color}</p>
+        <p><strong>Description:</strong> ${data.inv_description}</p>
+      </div>
+    </div>
+  `;
+}
+
+module.exports = Util
