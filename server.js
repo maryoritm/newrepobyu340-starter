@@ -55,6 +55,10 @@ app.use(async (err, req, res, next) => {
 
 
 
+// Error handling middleware
+app.use(require("./middleware/errorHandler"));
+
+
 /* ***********************
  * Local Server Information
  * Values from .env (environment) file
@@ -68,3 +72,4 @@ const host = process.env.HOST
 app.listen(port, () => {
   console.log(`app listening on ${host}:${port}`)
 })
+
