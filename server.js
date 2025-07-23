@@ -17,21 +17,36 @@ const utilities = require("./utilities/")
 /* ***********************
  * View Engine and Templates
  *************************/
-app.set("view engine", "ejs"); // Configura EJS como motor de plantillas
-app.use(expressLayouts); // Habilita el uso de layouts
-app.set("layout", "./layouts/layout"); // Ruta del layout base (dentro de views/)
+app.set("view engine", "ejs");
+app.use(expressLayouts);
+app.set("layout", "./layouts/layout");
 
+/* ***********************
+ * Middleware
+ *************************/
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 /* ***********************
  * Routes
  *************************/
+// Static routes
+app.use(static);
+
 // Inventory routes
 app.use("/inv", inventoryRoute);
-app.use(static)
 
 // Index route
-// Index route
-app.get("/", utilities.handleErrors(baseController.buildHome))
+app.get("/", utilities.handleErrors(baseController.buildHome));
+
+// Ruta para probar errores 500 - DEBE IR ANTES DEL MANEJADOR 404
+app.get("/errors/trigger-error", (req, res, next) => {
+  // Forzamos un error 500 para propósitos de prueba
+  next({
+    status: 500, 
+    message: 'This is a test error (500) triggered intentionally'
+  });
+});
 
 // File Not Found Route - must be last route in list
 app.use(async (req, res, next) => {
@@ -43,33 +58,37 @@ app.use(async (req, res, next) => {
 * Place after all other middleware
 *************************/
 app.use(async (err, req, res, next) => {
-  let nav = await utilities.getNav()
-  console.error(`Error at: "${req.originalUrl}": ${err.message}`)
-  if(err.status == 404){ message = err.message} else {message = 'Oh no! There was a crash. Maybe try a different route?'}
-  res.render("errors/error", {
+  let nav = await utilities.getNav();
+  console.error(`Error at: "${req.originalUrl}": ${err.message}`);
+  
+  // Mensajes personalizados por tipo de error
+  let message;
+  if(err.status == 404) {
+    message = err.message;
+  } else if(err.status == 500) {
+    message = 'Internal Server Error: ' + err.message;
+  } else {
+    message = 'Oh no! There was a crash. Maybe try a different route?';
+  }
+  
+  res.status(err.status || 500).render("errors/error", {
     title: err.status || 'Server Error',
     message,
-    nav
-  })
-})
-
-
-
-// Error handling middleware
-app.use(require("./middleware/errorHandler"));
-
+    nav,
+    errorCode: err.status // Pasamos el código de error a la vista
+  });
+});
 
 /* ***********************
  * Local Server Information
  * Values from .env (environment) file
  *************************/
-const port = process.env.PORT
-const host = process.env.HOST
+const port = process.env.PORT;
+const host = process.env.HOST;
 
 /* ***********************
  * Log statement to confirm server operation
  *************************/
 app.listen(port, () => {
-  console.log(`app listening on ${host}:${port}`)
-})
-
+  console.log(`app listening on ${host}:${port}`);
+});
