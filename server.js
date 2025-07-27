@@ -14,6 +14,31 @@ const app = express()
 const static = require("./routes/static")
 const utilities = require("./utilities/")
 
+const session = require("express-session");
+const pool = require('./database/');
+
+const accountRoute = require("./routes/accountRoute");
+/* ***********************
+ * Middleware
+ * ************************/
+app.use(session({
+  store: new (require('connect-pg-simple')(session))({
+    createTableIfMissing: true,
+    pool,
+  }),
+  secret: process.env.SESSION_SECRET,
+  resave: true,
+  saveUninitialized: true,
+  name: 'sessionId',
+}))
+
+// Express Messages Middleware
+app.use(require('connect-flash')())
+app.use(function(req, res, next){
+  res.locals.messages = require('express-messages')(req, res)
+  next()
+})
+
 /* ***********************
  * View Engine and Templates
  *************************/
@@ -30,6 +55,9 @@ app.use(express.urlencoded({ extended: true }));
 /* ***********************
  * Routes
  *************************/
+
+app.use("/account", accountRoute);
+
 // Static routes
 app.use(static);
 
@@ -52,6 +80,8 @@ app.get("/errors/trigger-error", (req, res, next) => {
 app.use(async (req, res, next) => {
   next({status: 404, message: 'Sorry, we appear to have lost that page.'})
 })
+
+
 
 /* ***********************
 * Express Error Handler

@@ -271,3 +271,60 @@ footer a:hover {
 .error-message a:hover {
   text-decoration: underline;
 }
+
+
+.flash-error {
+  color: red;
+  margin: 10px 0;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  max-width: 400px;
+  margin: 20px 0;
+}
+
+label {
+  margin-top: 10px;
+}
+
+input,
+button {
+  padding: 8px;
+  margin-top: 5px;
+}
+
+button {
+  margin-top: 15px;
+  background: #007BFF;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #0056b3;
+}
+
+
+/* Registration Form Styles */
+#togglePassword {
+  margin-top: 5px;
+  padding: 5px 10px;
+  background: #6c757d;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+#togglePassword:hover {
+  background: #5a6268;
+}
+
+input[type="password"],
+input[type="text"],
+input[type="email"] {
+  width: 100%;
+  max-width: 400px;
+}
