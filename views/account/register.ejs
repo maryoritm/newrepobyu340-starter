@@ -21,6 +21,16 @@
             </div>
             <% } %>
 
+
+            <% if (errors && errors.length> 0) { %>
+                <ul class="notice">
+                    <% errors.forEach(error=> { %>
+                        <li>
+                            <%= error.msg %>
+                        </li>
+                        <% }) %>
+                </ul>       <% } %>
+
                 <form action="/account/register" method="post">
                     <label for="account_firstname">First Name:</label>
                     <input type="text" id="account_firstname" name="account_firstname" required>
