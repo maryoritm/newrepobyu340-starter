@@ -21,28 +21,28 @@
             </div>
             <% } %>
 
-                <form action="/account/login" method="POST">
-                    <label for="account_email">Email:</label>
-                    <input type="email" id="account_email" name="account_email" required placeholder="Enter your email">
+                <% if (errors && errors.length> 0) { %>
+                    <ul class="notice">
+                        <% errors.forEach(error=> { %>
+                            <li>
+                                <%= error.msg %>
+                            </li>
+                            <% }) %>
+                    </ul>
+                    <% } %>
 
-                    <label for="account_password">Password:</label>
-                    <div class="password-requirements">
-                        Password must be at least 12 characters and contain:
-                        <ul>
-                            <li>1 uppercase letter</li>
-                            <li>1 lowercase letter</li>
-                            <li>1 number</li>
-                            <li>1 special character</li>
-                        </ul>
-                    </div>
-                    <input type="password" id="account_password" name="account_password" required
-                        pattern="^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{12,}$"
-                        title="Must contain at least 12 characters, including 1 uppercase, 1 lowercase, 1 number, and 1 special character">
+                        <form action="/account/login" method="POST">
+                            <label for="account_email">Email:</label>
+                            <input type="email" id="account_email" name="account_email" required
+                                placeholder="Enter your email" value="<%= locals.account_email %>">
 
-                    <button type="submit">Login</button>
-                </form>
+                            <label for="account_password">Password:</label>
+                            <input type="password" id="account_password" name="account_password" required>
 
-                <p>Don't have an account? <a href="/account/register">Register here</a>.</p>
+                            <button type="submit">Login</button>
+                        </form>
+
+                        <p>Don't have an account? <a href="/account/register">Register here</a>.</p>
     </main>
 </body>
 
