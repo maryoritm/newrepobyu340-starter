@@ -11,30 +11,39 @@
 </head>
 
 <body>
+    <main>
+        <h1>
+            <%= title %>
+        </h1>
+        <% if (typeof flash !=='undefined' && flash.error) { %>
+            <div class="flash-error">
+                <%= flash.error %>
+            </div>
+            <% } %>
 
-        <main>
-            <h1>
-                <%= title %>
-            </h1>
-            <% if (typeof flash !=='undefined' && flash.error) { %>
-                <div class="flash-error">
-                    <%= flash.error %>
-                </div>
-                <% } %>
+                <form action="/account/login" method="POST">
+                    <label for="account_email">Email:</label>
+                    <input type="email" id="account_email" name="account_email" required placeholder="Enter your email">
 
-                    <form action="/account/login" method="POST">
-                        <label for="account_email">Email:</label>
-                        <input type="email" id="account_email" name="account_email" required>
+                    <label for="account_password">Password:</label>
+                    <div class="password-requirements">
+                        Password must be at least 12 characters and contain:
+                        <ul>
+                            <li>1 uppercase letter</li>
+                            <li>1 lowercase letter</li>
+                            <li>1 number</li>
+                            <li>1 special character</li>
+                        </ul>
+                    </div>
+                    <input type="password" id="account_password" name="account_password" required
+                        pattern="^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{12,}$"
+                        title="Must contain at least 12 characters, including 1 uppercase, 1 lowercase, 1 number, and 1 special character">
 
-                        <label for="account_password">Password:</label>
-                        <input type="password" id="account_password" name="account_password" required>
+                    <button type="submit">Login</button>
+                </form>
 
-                        <button type="submit">Login</button>
-                    </form>
-
-                    <p>Don't have an account? <a href="/account/register">Register here</a>.</p>
-        </main>
-
+                <p>Don't have an account? <a href="/account/register">Register here</a>.</p>
+    </main>
 </body>
 
 </html>
