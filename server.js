@@ -13,11 +13,13 @@ const env = require("dotenv").config()
 const app = express()
 const static = require("./routes/static")
 const utilities = require("./utilities/")
+const bodyParser = require("body-parser");
 
 const session = require("express-session");
 const pool = require('./database/');
 
 const accountRoute = require("./routes/accountRoute");
+
 /* ***********************
  * Middleware
  * ************************/
@@ -39,6 +41,10 @@ app.use(function(req, res, next){
   next()
 })
 
+// Body Parser Middleware
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
+
 /* ***********************
  * View Engine and Templates
  *************************/
@@ -47,15 +53,8 @@ app.use(expressLayouts);
 app.set("layout", "./layouts/layout");
 
 /* ***********************
- * Middleware
- *************************/
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-/* ***********************
  * Routes
  *************************/
-
 app.use("/account", accountRoute);
 
 // Static routes
@@ -80,8 +79,6 @@ app.get("/errors/trigger-error", (req, res, next) => {
 app.use(async (req, res, next) => {
   next({status: 404, message: 'Sorry, we appear to have lost that page.'})
 })
-
-
 
 /* ***********************
 * Express Error Handler
