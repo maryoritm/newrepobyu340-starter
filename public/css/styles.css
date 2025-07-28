@@ -441,3 +441,10 @@ input:required:valid {
     padding: 15px;
   }
 }
+
+/* public/css/styles.css */
+.error-icon {
+  font-size: 5rem;
+  text-align: center;
+  margin: 2rem 0;
+}

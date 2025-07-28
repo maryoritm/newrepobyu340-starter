@@ -5,45 +5,61 @@
 /* ***********************
  * Require Statements
  *************************/
-const inventoryRoute = require("./routes/inventoryRoute");
-const baseController = require("./controllers/baseController")
-const express = require("express")
+const express = require("express");
 const expressLayouts = require("express-ejs-layouts");
-const env = require("dotenv").config()
-const app = express()
-const static = require("./routes/static")
-const utilities = require("./utilities/")
+const env = require("dotenv").config();
+const app = express();
 const bodyParser = require("body-parser");
-
 const session = require("express-session");
 const pool = require('./database/');
+const flash = require('connect-flash');
+const messages = require('express-messages');
 
+// Routes
+const static = require("./routes/static");
+const baseController = require("./controllers/baseController");
+const inventoryRoute = require("./routes/inventoryRoute");
 const accountRoute = require("./routes/accountRoute");
+const utilities = require("./utilities/");
 
 /* ***********************
  * Middleware
  * ************************/
+// Session configuration
 app.use(session({
   store: new (require('connect-pg-simple')(session))({
     createTableIfMissing: true,
     pool,
+    pruneSessionInterval: 60 * 60 // Limpia sesiones cada hora
   }),
   secret: process.env.SESSION_SECRET,
-  resave: true,
-  saveUninitialized: true,
+  resave: false,
+  saveUninitialized: false,
   name: 'sessionId',
-}))
+  cookie: { 
+    maxAge: 24 * 60 * 60 * 1000, // 1 día
+    secure: process.env.NODE_ENV === 'production',
+    httpOnly: true
+  }
+}));
 
-// Express Messages Middleware
-app.use(require('connect-flash')())
-app.use(function(req, res, next){
-  res.locals.messages = require('express-messages')(req, res)
-  next()
-})
+// Flash messages middleware
+app.use(flash());
+
+// Make flash messages available to all views
+app.use((req, res, next) => {
+  res.locals.messages = messages(req, res);
+  res.locals.errors = [];
+  res.locals.classification_name = '';
+  next();
+});
 
 // Body Parser Middleware
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+// Static files
+app.use(express.static('public'));
 
 /* ***********************
  * View Engine and Templates
@@ -55,20 +71,15 @@ app.set("layout", "./layouts/layout");
 /* ***********************
  * Routes
  *************************/
-app.use("/account", accountRoute);
-
-// Static routes
 app.use(static);
-
-// Inventory routes
+app.use("/account", accountRoute);
 app.use("/inv", inventoryRoute);
 
 // Index route
 app.get("/", utilities.handleErrors(baseController.buildHome));
 
-// Ruta para probar errores 500 - DEBE IR ANTES DEL MANEJADOR 404
+// Ruta para probar errores 500
 app.get("/errors/trigger-error", (req, res, next) => {
-  // Forzamos un error 500 para propósitos de prueba
   next({
     status: 500, 
     message: 'This is a test error (500) triggered intentionally'
@@ -82,13 +93,11 @@ app.use(async (req, res, next) => {
 
 /* ***********************
 * Express Error Handler
-* Place after all other middleware
 *************************/
 app.use(async (err, req, res, next) => {
   let nav = await utilities.getNav();
   console.error(`Error at: "${req.originalUrl}": ${err.message}`);
   
-  // Mensajes personalizados por tipo de error
   let message;
   if(err.status == 404) {
     message = err.message;
@@ -102,20 +111,16 @@ app.use(async (err, req, res, next) => {
     title: err.status || 'Server Error',
     message,
     nav,
-    errorCode: err.status // Pasamos el código de error a la vista
+    errorCode: err.status
   });
 });
 
 /* ***********************
- * Local Server Information
- * Values from .env (environment) file
+ * Server Configuration
  *************************/
-const port = process.env.PORT;
-const host = process.env.HOST;
+const port = process.env.PORT || 5500;
+const host = process.env.HOST || 'localhost';
 
-/* ***********************
- * Log statement to confirm server operation
- *************************/
 app.listen(port, () => {
   console.log(`app listening on ${host}:${port}`);
 });
