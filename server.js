@@ -14,6 +14,7 @@ const session = require("express-session");
 const pool = require('./database/');
 const flash = require('connect-flash');
 const messages = require('express-messages');
+const cookieParser = require("cookie-parser")
 
 // Routes
 const static = require("./routes/static");
@@ -57,6 +58,9 @@ app.use((req, res, next) => {
 // Body Parser Middleware
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+app.use(cookieParser())
+app.use(utilities.checkJWTToken)
 
 // Static files
 app.use(express.static('public'));

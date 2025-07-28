@@ -10,6 +10,9 @@ router.get("/login", utilities.handleErrors(accountController.buildLogin));
 // GET route for registration view
 router.get("/register", utilities.handleErrors(accountController.buildRegister));
 
+// GET route for account management view
+router.get("/", utilities.handleErrors(accountController.accountManagement));
+
 // POST route for registration processing
 router.post(
     "/register",
