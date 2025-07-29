@@ -10,23 +10,27 @@ router.get("/login", utilities.handleErrors(accountController.buildLogin));
 // GET route for registration view
 router.get("/register", utilities.handleErrors(accountController.buildRegister));
 
-// GET route for account management view
-router.get("/", utilities.handleErrors(accountController.accountManagement));
+// GET route for account management view (protegida por checkLogin)
+router.get(
+  "/", 
+  utilities.checkLogin,
+  utilities.handleErrors(accountController.accountManagement)
+);
 
 // POST route for registration processing
 router.post(
-    "/register",
-    regValidate.registationRules(),
-    regValidate.checkRegData,
-    utilities.handleErrors(accountController.registerAccount)
+  "/register",
+  regValidate.registationRules(),
+  regValidate.checkRegData,
+  utilities.handleErrors(accountController.registerAccount)
 );
 
 // Process the login attempt
 router.post(
-    "/login",
-    regValidate.loginRules(),
-    regValidate.checkLoginData,
-    utilities.handleErrors(accountController.accountLogin)
+  "/login",
+  regValidate.loginRules(),
+  regValidate.checkLoginData,
+  utilities.handleErrors(accountController.accountLogin)
 );
 
 module.exports = router;
