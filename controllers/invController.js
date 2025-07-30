@@ -195,4 +195,85 @@ invCont.addInventory = async function (req, res, next) {
   }
 };
 
+/* ***************************
+ *  Build edit inventory view
+ * ************************** */
+invCont.buildEditInventoryView = async function (req, res, next) {
+  try {
+    const inv_id = parseInt(req.params.inv_id);
+    let nav = await utilities.getNav();
+    const itemData = await invModel.getInventoryById(inv_id);
+    const classificationList = await utilities.buildClassificationList(itemData.classification_id);
+    const itemName = `${itemData.inv_make} ${itemData.inv_model}`;
+    
+    res.render("./inventory/edit-inventory", {
+      title: "Edit " + itemName,
+      nav,
+      classificationList,
+      message: req.flash('message') || null,
+      errors: [],
+      inv_id: itemData.inv_id,
+      inv_make: itemData.inv_make,
+      inv_model: itemData.inv_model,
+      inv_year: itemData.inv_year,
+      inv_description: itemData.inv_description,
+      inv_image: itemData.inv_image,
+      inv_thumbnail: itemData.inv_thumbnail,
+      inv_price: itemData.inv_price,
+      inv_miles: itemData.inv_miles,
+      inv_color: itemData.inv_color,
+      classification_id: itemData.classification_id
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/* ***************************
+ *  Process inventory update
+ * ************************** */
+invCont.updateInventory = async function (req, res, next) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    try {
+      const inv_id = req.body.inv_id;
+      let nav = await utilities.getNav();
+      const itemData = await invModel.getInventoryById(inv_id);
+      const classificationList = await utilities.buildClassificationList(itemData.classification_id);
+      const itemName = `${itemData.inv_make} ${itemData.inv_model}`;
+      
+      return res.render("./inventory/edit-inventory", {
+        title: "Edit " + itemName,
+        nav,
+        classificationList,
+        message: null,
+        errors: errors.array(),
+        ...req.body
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  try {
+    const { 
+      inv_id, inv_make, inv_model, inv_year, 
+      inv_description, inv_image, inv_thumbnail, 
+      inv_price, inv_miles, inv_color, classification_id 
+    } = req.body;
+    
+    await invModel.updateInventory({
+      inv_id, inv_make, inv_model, inv_year, 
+      inv_description, inv_image, inv_thumbnail, 
+      inv_price, inv_miles, inv_color, classification_id
+    });
+    
+    req.flash('message', 'Inventory item updated successfully!');
+    res.redirect('/inv/management');
+  } catch (error) {
+    req.flash('message', 'Failed to update inventory item');
+    next(error);
+  }
+};
+
 module.exports = invCont;

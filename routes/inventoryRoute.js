@@ -56,4 +56,30 @@ router.post(
   utilities.handleErrors(invController.addInventory)
 );
 
+// Route to build edit inventory view
+router.get("/edit/:inv_id", utilities.handleErrors(invController.buildEditInventoryView));
+
+// Route to process inventory update
+router.post(
+  "/update",
+  [
+    body('inv_make').trim().notEmpty().withMessage('Make is required').escape(),
+    body('inv_model').trim().notEmpty().withMessage('Model is required').escape(),
+    body('inv_year')
+      .isInt({ min: 1900, max: new Date().getFullYear() })
+      .withMessage('Valid year is required'),
+    body('inv_price')
+      .isFloat({ min: 0 })
+      .withMessage('Valid price is required'),
+    body('inv_miles')
+      .isInt({ min: 0 })
+      .withMessage('Valid mileage is required'),
+    body('inv_color').trim().notEmpty().withMessage('Color is required').escape(),
+    body('inv_description').trim().notEmpty().withMessage('Description is required').escape(),
+    body('classification_id').notEmpty().withMessage('Classification is required'),
+    body('inv_id').notEmpty().withMessage('Inventory ID is required')
+  ],
+  utilities.handleErrors(invController.updateInventory)
+);
+
 module.exports = router;
