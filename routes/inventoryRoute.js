@@ -14,6 +14,8 @@ router.get("/detail/:inv_id", utilities.handleErrors(invController.buildByInvent
 router.get("/", utilities.handleErrors(invController.buildManagementView));
 router.get("/management", utilities.handleErrors(invController.buildManagementView));
 
+// Route to get inventory as JSON
+router.get("/getInventory/:classification_id", utilities.handleErrors(invController.getInventoryJSON));
 
 // Classification routes
 router.get("/add-classification", utilities.handleErrors(invController.buildAddClassification));
