@@ -1,0 +1,56 @@
+<main>
+    <h1>Delete Vehicle</h1>
+
+    <% if (message) { %>
+        <div class="flash-message <%= message.includes('successfully') ? 'success' : 'error' %>">
+            <%= message %>
+        </div>
+        <% } %>
+
+            <% if (errors && errors.length> 0) { %>
+                <div class="errors">
+                    <ul>
+                        <% errors.forEach(error=> { %>
+                            <li>
+                                <%= error.msg %>
+                            </li>
+                            <% }) %>
+                    </ul>
+                </div>
+                <% } %>
+
+                    <p>Confirm Deletion - The delete is permanent.</p>
+
+                    <form action="/inv/delete" method="post" class="inventory-form">
+                        <input type="hidden" name="inv_id" value="<%= inv_id %>">
+
+                        <!-- Make -->
+                        <div class="form-group">
+                            <label for="inv_make">Make:</label>
+                            <input type="text" name="inv_make" id="inv_make" readonly value="<%= inv_make %>">
+                        </div>
+
+                        <!-- Model -->
+                        <div class="form-group">
+                            <label for="inv_model">Model:</label>
+                            <input type="text" name="inv_model" id="inv_model" readonly value="<%= inv_model %>">
+                        </div>
+
+                        <!-- Year -->
+                        <div class="form-group">
+                            <label for="inv_year">Year:</label>
+                            <input type="number" name="inv_year" id="inv_year" readonly value="<%= inv_year %>">
+                        </div>
+
+                        <!-- Price -->
+                        <div class="form-group">
+                            <label for="inv_price">Price:</label>
+                            <input type="number" name="inv_price" id="inv_price" readonly value="<%= inv_price %>">
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn">Delete Vehicle</button>
+                            <a href="/inv/management" class="btn cancel">Cancel</a>
+                        </div>
+                    </form>
+</main>
