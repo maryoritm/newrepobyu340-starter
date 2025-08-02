@@ -10,17 +10,33 @@ router.get("/type/:classificationId", utilities.handleErrors(invController.build
 // Route to build inventory item detail view
 router.get("/detail/:inv_id", utilities.handleErrors(invController.buildByInventoryId));
 
-// Management routes
-router.get("/", utilities.handleErrors(invController.buildManagementView));
-router.get("/management", utilities.handleErrors(invController.buildManagementView));
+// Management routes - Protegidas para empleados/admins
+router.get("/", 
+  utilities.checkLogin,
+  utilities.checkEmployee,
+  utilities.handleErrors(invController.buildManagementView));
+
+router.get("/management", 
+  utilities.checkLogin,
+  utilities.checkEmployee,
+  utilities.handleErrors(invController.buildManagementView));
 
 // Route to get inventory as JSON
-router.get("/getInventory/:classification_id", utilities.handleErrors(invController.getInventoryJSON));
+router.get("/getInventory/:classification_id", 
+  utilities.checkLogin,
+  utilities.checkEmployee,
+  utilities.handleErrors(invController.getInventoryJSON));
 
-// Classification routes
-router.get("/add-classification", utilities.handleErrors(invController.buildAddClassification));
+// Classification routes - Protegidas para empleados/admins
+router.get("/add-classification", 
+  utilities.checkLogin,
+  utilities.checkEmployee,
+  utilities.handleErrors(invController.buildAddClassification));
+
 router.post(
   "/add-classification",
+  utilities.checkLogin,
+  utilities.checkEmployee,
   [
     body('classification_name')
       .trim()
@@ -33,10 +49,16 @@ router.post(
   utilities.handleErrors(invController.addClassification)
 );
 
-// Inventory routes
-router.get("/add-inventory", utilities.handleErrors(invController.buildAddInventory));
+// Inventory routes - Protegidas para empleados/admins
+router.get("/add-inventory", 
+  utilities.checkLogin,
+  utilities.checkEmployee,
+  utilities.handleErrors(invController.buildAddInventory));
+
 router.post(
   "/add-inventory",
+  utilities.checkLogin,
+  utilities.checkEmployee,
   [
     body('inv_make').trim().notEmpty().withMessage('Make is required').escape(),
     body('inv_model').trim().notEmpty().withMessage('Model is required').escape(),
@@ -56,12 +78,16 @@ router.post(
   utilities.handleErrors(invController.addInventory)
 );
 
-// Route to build edit inventory view
-router.get("/edit/:inv_id", utilities.handleErrors(invController.buildEditInventoryView));
+// Edit routes - Protegidas para empleados/admins
+router.get("/edit/:inv_id", 
+  utilities.checkLogin,
+  utilities.checkEmployee,
+  utilities.handleErrors(invController.buildEditInventoryView));
 
-// Route to process inventory update
 router.post(
   "/update",
+  utilities.checkLogin,
+  utilities.checkEmployee,
   [
     body('inv_make').trim().notEmpty().withMessage('Make is required').escape(),
     body('inv_model').trim().notEmpty().withMessage('Model is required').escape(),
@@ -82,10 +108,15 @@ router.post(
   utilities.handleErrors(invController.updateInventory)
 );
 
-// Route to build delete confirmation view
-router.get("/delete/:inv_id", utilities.handleErrors(invController.buildDeleteConfirm));
+// Delete routes - Protegidas para empleados/admins
+router.get("/delete/:inv_id", 
+  utilities.checkLogin,
+  utilities.checkEmployee,
+  utilities.handleErrors(invController.buildDeleteConfirm));
 
-// Route to process inventory deletion
-router.post("/delete", utilities.handleErrors(invController.deleteInventoryItem));
+router.post("/delete", 
+  utilities.checkLogin,
+  utilities.checkEmployee,
+  utilities.handleErrors(invController.deleteInventoryItem));
 
 module.exports = router;

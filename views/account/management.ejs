@@ -1,36 +1,25 @@
-<!DOCTYPE html>
-<html lang="en">
+<h1>
+    <%= title %>
+</h1>
+<% if (typeof flash !=='undefined' && flash.notice) { %>
+    <div class="flash-notice">
+        <%= flash.notice %>
+    </div>
+    <% } %>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>
-        <%= title %>
-    </title>
-    <link rel="stylesheet" href="/css/styles.css">
-</head>
+        <div class="account-info">
+            <h2>Welcome, <%= locals.accountData.account_firstname %>
+            </h2>
 
-<body>
-        <main>
-            <h1>
-                <%= title %>
-            </h1>
-            <% if (typeof flash !=='undefined' && flash.notice) { %>
-                <div class="flash-notice">
-                    <%= flash.notice %>
-                </div>
+            <p><a href="/account/update/<%= locals.accountData.account_id %>">Update Account Information</a></p>
+
+            <% if (locals.accountData.account_type==='Employee' || locals.accountData.account_type==='Admin' ) { %>
+                <h3>Inventory Management</h3>
+                <p><a href="/inv/">Manage Inventory</a></p>
                 <% } %>
 
-                    <div class="account-info">
-                        <h2>Welcome, <%= locals.accountData.account_firstname %>
-                        </h2>
-                        <p>You're logged in!</p>
-                        <p>Email: <%= locals.accountData.account_email %>
-                        </p>
-                        <p>Account Type: <%= locals.accountData.account_type %>
-                        </p>
-                    </div>
-        </main>
-</body>
-
-</html>
+                    <p>Email: <%= locals.accountData.account_email %>
+                    </p>
+                    <p>Account Type: <%= locals.accountData.account_type %>
+                    </p>
+        </div>

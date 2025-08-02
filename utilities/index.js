@@ -162,6 +162,19 @@ Util.checkLogin = (req, res, next) => {
     req.flash("notice", "Please log in.")
     return res.redirect("/account/login")
   }
- }
+}
+ /* ****************************************
+*  Check Employee or Admin Access
+* ************************************ */
+Util.checkEmployee = (req, res, next) => {
+  if (res.locals.loggedin && 
+      (res.locals.accountData.account_type === 'Employee' || 
+       res.locals.accountData.account_type === 'Admin')) {
+    next()
+  } else {
+    req.flash("notice", "You must be an employee or admin to access this page.")
+    return res.redirect("/account/login")
+  }
+}
 
 module.exports = Util;
