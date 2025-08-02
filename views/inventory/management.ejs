@@ -1,6 +1,6 @@
 <h1>Inventory Management</h1>
 <% if (message) { %>
-    <div class="flash-message">
+    <div class="flash-message <%= message.includes('successfully') ? 'success' : 'error' %>">
         <%= message %>
     </div>
     <% } %>

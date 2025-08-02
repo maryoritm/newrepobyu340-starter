@@ -71,6 +71,13 @@ async function addInventory(
   classification_id
 ) {
   try {
+    // Validación de campos requeridos
+    if (!inv_make || !inv_model || !inv_year || !inv_description || 
+        !inv_image || !inv_thumbnail || !inv_price || !inv_miles || 
+        !inv_color || !classification_id) {
+      throw new Error("Todos los campos son requeridos");
+    }
+
     const sql = `INSERT INTO inventory (
       inv_make, inv_model, inv_year, inv_description, 
       inv_image, inv_thumbnail, inv_price, inv_miles, 
@@ -78,16 +85,16 @@ async function addInventory(
     ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *`;
     
     return await pool.query(sql, [
-      inv_make,
-      inv_model,
-      inv_year,
-      inv_description,
-      inv_image,
-      inv_thumbnail,
-      inv_price,
-      inv_miles,
-      inv_color,
-      classification_id
+      inv_make.trim(),
+      inv_model.trim(),
+      parseInt(inv_year),
+      inv_description.trim(),
+      inv_image.trim(),
+      inv_thumbnail.trim(),
+      parseFloat(inv_price),
+      parseInt(inv_miles),
+      inv_color.trim(),
+      parseInt(classification_id)
     ]);
   } catch (error) {
     console.error("addInventory error " + error);
@@ -122,17 +129,17 @@ async function updateInventory(
        RETURNING *`;
     
     const data = await pool.query(sql, [
-      inv_make,
-      inv_model,
-      inv_description,
-      inv_image,
-      inv_thumbnail,
-      inv_price,
-      inv_year,
-      inv_miles,
-      inv_color,
-      classification_id,
-      inv_id
+      inv_make.trim(),
+      inv_model.trim(),
+      inv_description.trim(),
+      inv_image.trim(),
+      inv_thumbnail.trim(),
+      parseFloat(inv_price),
+      parseInt(inv_year),
+      parseInt(inv_miles),
+      inv_color.trim(),
+      parseInt(classification_id),
+      parseInt(inv_id)
     ]);
     return data.rows[0];
   } catch (error) {
@@ -140,7 +147,6 @@ async function updateInventory(
     throw error;
   }
 }
-
 
 /* ***************************
  *  Delete Inventory Item

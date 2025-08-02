@@ -1,95 +1,92 @@
-<main>
-    <h1>Edit Vehicle</h1>
+<h1>Add New Vehicle</h1>
 
-    <% if (message) { %>
-        <div class="flash-message <%= message.includes('successfully') ? 'success' : 'error' %>">
-            <%= message %>
-        </div>
-        <% } %>
+<% if (message) { %>
+    <div class="flash-message <%= message.includes('successfully') ? 'success' : 'error' %>">
+        <%= message %>
+    </div>
+    <% } %>
 
-            <% if (errors && errors.length> 0) { %>
-                <div class="errors">
-                    <ul>
-                        <% errors.forEach(error=> { %>
-                            <li>
-                                <%= error.msg %>
-                            </li>
-                            <% }) %>
-                    </ul>
-                </div>
-                <% } %>
+        <% if (errors && errors.length> 0) { %>
+            <div class="errors">
+                <ul>
+                    <% errors.forEach(error=> { %>
+                        <li>
+                            <%= error.msg %>
+                        </li>
+                        <% }) %>
+                </ul>
+            </div>
+            <% } %>
 
-                    <form action="/inv/update" method="post" class="inventory-form">
-                        <input type="hidden" name="inv_id" value="<%= inv_id %>">
+                <form action="/inv/add-inventory" method="post" class="inventory-form">
+                    <!-- Make -->
+                    <div class="form-group">
+                        <label for="inv_make">Make:</label>
+                        <input type="text" name="inv_make" id="inv_make" required value="<%= inv_make || '' %>">
+                    </div>
 
-                        <!-- Make -->
-                        <div class="form-group">
-                            <label for="inv_make">Make:</label>
-                            <input type="text" name="inv_make" id="inv_make" required value="<%= inv_make %>">
-                        </div>
+                    <!-- Model -->
+                    <div class="form-group">
+                        <label for="inv_model">Model:</label>
+                        <input type="text" name="inv_model" id="inv_model" required value="<%= inv_model || '' %>">
+                    </div>
 
-                        <!-- Model -->
-                        <div class="form-group">
-                            <label for="inv_model">Model:</label>
-                            <input type="text" name="inv_model" id="inv_model" required value="<%= inv_model %>">
-                        </div>
+                    <!-- Year -->
+                    <div class="form-group">
+                        <label for="inv_year">Year:</label>
+                        <input type="number" name="inv_year" id="inv_year" min="1900"
+                            max="<%= new Date().getFullYear() + 1 %>" required value="<%= inv_year || '' %>">
+                    </div>
 
-                        <!-- Year -->
-                        <div class="form-group">
-                            <label for="inv_year">Year:</label>
-                            <input type="number" name="inv_year" id="inv_year" min="1900"
-                                max="<%= new Date().getFullYear() + 1 %>" required value="<%= inv_year %>">
-                        </div>
+                    <!-- Classification -->
+                    <div class="form-group">
+                        <label for="classificationList">Classification:</label>
+                        <%- classificationList %>
+                    </div>
 
-                        <!-- Classification -->
-                        <div class="form-group">
-                            <label for="classification_id">Classification:</label>
-                            <%- classificationList %>
-                        </div>
+                    <!-- Description -->
+                    <div class="form-group">
+                        <label for="inv_description">Description:</label>
+                        <textarea name="inv_description" id="inv_description" required
+                            rows="4"><%= inv_description || '' %></textarea>
+                    </div>
 
-                        <!-- Description -->
-                        <div class="form-group">
-                            <label for="inv_description">Description:</label>
-                            <textarea name="inv_description" id="inv_description" required
-                                rows="4"><%= inv_description %></textarea>
-                        </div>
+                    <!-- Image Path -->
+                    <div class="form-group">
+                        <label for="inv_image">Image Path:</label>
+                        <input type="text" name="inv_image" id="inv_image" required
+                            value="<%= inv_image || '/images/vehicles/no-image.png' %>">
+                    </div>
 
-                        <!-- Image Path -->
-                        <div class="form-group">
-                            <label for="inv_image">Image Path:</label>
-                            <input type="text" name="inv_image" id="inv_image" required value="<%= inv_image %>">
-                        </div>
+                    <!-- Thumbnail Path -->
+                    <div class="form-group">
+                        <label for="inv_thumbnail">Thumbnail Path:</label>
+                        <input type="text" name="inv_thumbnail" id="inv_thumbnail" required
+                            value="<%= inv_thumbnail || '/images/vehicles/no-image-tn.png' %>">
+                    </div>
 
-                        <!-- Thumbnail Path -->
-                        <div class="form-group">
-                            <label for="inv_thumbnail">Thumbnail Path:</label>
-                            <input type="text" name="inv_thumbnail" id="inv_thumbnail" required
-                                value="<%= inv_thumbnail %>">
-                        </div>
+                    <!-- Price -->
+                    <div class="form-group">
+                        <label for="inv_price">Price:</label>
+                        <input type="number" name="inv_price" id="inv_price" min="0" step="0.01" required
+                            value="<%= inv_price || '' %>">
+                    </div>
 
-                        <!-- Price -->
-                        <div class="form-group">
-                            <label for="inv_price">Price:</label>
-                            <input type="number" name="inv_price" id="inv_price" min="0" step="0.01" required
-                                value="<%= inv_price %>">
-                        </div>
+                    <!-- Miles -->
+                    <div class="form-group">
+                        <label for="inv_miles">Miles:</label>
+                        <input type="number" name="inv_miles" id="inv_miles" min="0" required
+                            value="<%= inv_miles || '' %>">
+                    </div>
 
-                        <!-- Miles -->
-                        <div class="form-group">
-                            <label for="inv_miles">Miles:</label>
-                            <input type="number" name="inv_miles" id="inv_miles" min="0" required
-                                value="<%= inv_miles %>">
-                        </div>
+                    <!-- Color -->
+                    <div class="form-group">
+                        <label for="inv_color">Color:</label>
+                        <input type="text" name="inv_color" id="inv_color" required value="<%= inv_color || '' %>">
+                    </div>
 
-                        <!-- Color -->
-                        <div class="form-group">
-                            <label for="inv_color">Color:</label>
-                            <input type="text" name="inv_color" id="inv_color" required value="<%= inv_color %>">
-                        </div>
-
-                        <div class="form-actions">
-                            <button type="submit" class="btn">Update Vehicle</button>
-                            <a href="/inv/management" class="btn cancel">Cancel</a>
-                        </div>
-                    </form>
-</main>
+                    <div class="form-actions">
+                        <button type="submit" class="btn">Add Vehicle</button>
+                        <a href="/inv/management" class="btn cancel">Cancel</a>
+                    </div>
+                </form>

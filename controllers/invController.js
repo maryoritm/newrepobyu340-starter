@@ -157,6 +157,7 @@ invCont.buildAddInventory = async function (req, res, next) {
  * ************************** */
 invCont.addInventory = async function (req, res, next) {
   const errors = validationResult(req);
+  
   if (!errors.isEmpty()) {
     try {
       let nav = await utilities.getNav();
@@ -167,7 +168,10 @@ invCont.addInventory = async function (req, res, next) {
         classificationList,
         message: null,
         errors: errors.array(),
-        ...req.body
+        ...req.body,
+        // Asegurar valores por defecto para imágenes
+        inv_image: req.body.inv_image || '/images/vehicles/no-image.png',
+        inv_thumbnail: req.body.inv_thumbnail || '/images/vehicles/no-image-tn.png'
       });
     } catch (error) {
       next(error);
@@ -181,17 +185,35 @@ invCont.addInventory = async function (req, res, next) {
       inv_price, inv_miles, inv_color, classification_id 
     } = req.body;
     
-    await invModel.addInventory({
-      inv_make, inv_model, inv_year, 
-      inv_description, inv_image, inv_thumbnail, 
-      inv_price, inv_miles, inv_color, classification_id
-    });
+    // Validación adicional de campos
+    if (!inv_make || !inv_model || !inv_year || !classification_id) {
+      req.flash('error', 'All required fields must be filled');
+      return res.redirect('/inv/add-inventory');
+    }
+
+    // Asegurar valores para imágenes
+    const imagePath = inv_image || '/images/vehicles/no-image.png';
+    const thumbnailPath = inv_thumbnail || '/images/vehicles/no-image-tn.png';
     
-    req.flash('message', 'Inventory item added successfully!');
+    await invModel.addInventory(
+      inv_make,
+      inv_model,
+      parseInt(inv_year),
+      inv_description,
+      imagePath,
+      thumbnailPath,
+      parseFloat(inv_price),
+      parseInt(inv_miles),
+      inv_color,
+      parseInt(classification_id)
+    );
+    
+    req.flash('success', 'Inventory item added successfully!');
     res.redirect('/inv/management');
   } catch (error) {
-    req.flash('message', 'Failed to add inventory item');
-    next(error);
+    console.error('Error adding inventory:', error);
+    req.flash('error', 'Failed to add inventory item: ' + error.message);
+    res.redirect('/inv/add-inventory');
   }
 };
 
