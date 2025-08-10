@@ -502,3 +502,22 @@ input:required:valid {
 .management-links .btn {
   margin-right: 10px;
 }
+
+.reviews-list {
+  list-style: none;
+  padding: 0;
+}
+
+.reviews-list li {
+  border-bottom: 1px solid #ccc;
+  padding: 8px 0;
+}
+
+.reviews-list strong {
+  color: #333;
+}
+
+.error-messages {
+  color: red;
+  list-style: none;
+}

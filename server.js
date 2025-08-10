@@ -9,12 +9,11 @@ const express = require("express");
 const expressLayouts = require("express-ejs-layouts");
 const env = require("dotenv").config();
 const app = express();
-const bodyParser = require("body-parser");
 const session = require("express-session");
 const pool = require('./database/');
 const flash = require('connect-flash');
 const messages = require('express-messages');
-const cookieParser = require("cookie-parser")
+const cookieParser = require("cookie-parser");
 
 // Routes
 const static = require("./routes/static");
@@ -22,6 +21,7 @@ const baseController = require("./controllers/baseController");
 const inventoryRoute = require("./routes/inventoryRoute");
 const accountRoute = require("./routes/accountRoute");
 const utilities = require("./utilities/");
+const reviewRoutes = require("./routes/reviewRoutes");
 
 /* ***********************
  * Middleware
@@ -29,18 +29,20 @@ const utilities = require("./utilities/");
 // Session configuration
 app.use(session({
   store: new (require('connect-pg-simple')(session))({
-    createTableIfMissing: true,
     pool,
-    pruneSessionInterval: 60 * 60 // Limpia sesiones cada hora
+    createTableIfMissing: true,
+    pruneSessionInterval: 60 * 60
   }),
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
   name: 'sessionId',
-  cookie: { 
-    maxAge: 24 * 60 * 60 * 1000, // 1 día
-    secure: process.env.NODE_ENV === 'production',
-    httpOnly: true
+  cookie: {
+    maxAge: 24 * 60 * 60 * 1000,
+    secure: false, // Change to true in production
+    httpOnly: true,
+    sameSite: 'lax',
+    domain: 'localhost' // ESSENTIAL for development
   }
 }));
 
@@ -56,11 +58,10 @@ app.use((req, res, next) => {
 });
 
 // Body Parser Middleware
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-
-app.use(cookieParser())
-app.use(utilities.checkJWTToken)
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+app.use(utilities.checkJWTToken);
 
 // Static files
 app.use(express.static('public'));
@@ -78,11 +79,12 @@ app.set("layout", "./layouts/layout");
 app.use(static);
 app.use("/account", accountRoute);
 app.use("/inv", inventoryRoute);
+app.use("/reviews", reviewRoutes);
 
 // Index route
 app.get("/", utilities.handleErrors(baseController.buildHome));
 
-// Ruta para probar errores 500
+// Route to test 500 errors
 app.get("/errors/trigger-error", (req, res, next) => {
   next({
     status: 500, 
@@ -92,8 +94,8 @@ app.get("/errors/trigger-error", (req, res, next) => {
 
 // File Not Found Route - must be last route in list
 app.use(async (req, res, next) => {
-  next({status: 404, message: 'Sorry, we appear to have lost that page.'})
-})
+  next({status: 404, message: 'Sorry, we appear to have lost that page.'});
+});
 
 /* ***********************
 * Express Error Handler

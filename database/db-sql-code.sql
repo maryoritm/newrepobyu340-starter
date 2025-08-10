@@ -34,6 +34,23 @@ CREATE TABLE IF NOT EXISTS public.account (
     account_type account_type NOT NULL DEFAULT 'Client'::account_type,
     CONSTRAINT account_pkey PRIMARY KEY (account_id)
 );
+
+
+-- Script para crear la tabla reviews
+CREATE TABLE IF NOT EXISTS public.reviews (
+    review_id SERIAL PRIMARY KEY,
+    vehicle_id INTEGER NOT NULL REFERENCES public.inventory(inv_id) ON DELETE CASCADE,
+    account_id INTEGER NOT NULL REFERENCES public.account(account_id) ON DELETE CASCADE,
+    rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
+    comment TEXT NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Índices opcionales para mejorar rendimiento en consultas
+CREATE INDEX IF NOT EXISTS idx_reviews_vehicle_id ON public.reviews(vehicle_id);
+CREATE INDEX IF NOT EXISTS idx_reviews_account_id ON public.reviews(account_id);
+
 -- Data for table 'classification'
 INSERT INTO public.classification (classification_name)
 VALUES ('Custom'),
