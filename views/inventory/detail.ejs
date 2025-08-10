@@ -31,7 +31,7 @@
                 <% } %>
 
                     <h4>Add a Review</h4>
-                    <form id="reviewForm" action="/reviews/add" method="POST">
+                    <form id="reviewForm">
                         <input type="hidden" name="vehicle_id" value="<%= vehicleId %>">
 
                         <label for="rating">Rating:</label>
@@ -50,6 +50,10 @@
                         <button type="submit">Submit Review</button>
                     </form>
 
+                    <!-- Container for AJAX messages -->
+                    <div id="reviewMessage" class="message-container"></div>
+
+                    <!-- Display server-side errors if any -->
                     <% if (errors && errors.length> 0) { %>
                         <ul class="error-messages">
                             <% errors.forEach(e=> { %>
@@ -59,6 +63,75 @@
                                 <% }) %>
                         </ul>
                         <% } %>
+
+                            <script>
+                                document.getElementById('reviewForm').addEventListener('submit', async function (e) {
+                                    e.preventDefault();
+
+                                    const formData = {
+                                        vehicle_id: document.querySelector('input[name="vehicle_id"]').value,
+                                        rating: document.getElementById('rating').value,
+                                        comment: document.getElementById('comment').value
+                                    };
+
+                                    const messageContainer = document.getElementById('reviewMessage');
+                                    messageContainer.innerHTML = '';
+                                    messageContainer.style.display = 'block';
+
+                                    try {
+                                        const response = await fetch('/reviews/add', {
+                                            method: 'POST',
+                                            headers: {
+                                                'Content-Type': 'application/json',
+                                            },
+                                            body: JSON.stringify(formData)
+                                        });
+
+                                        const data = await response.json();
+
+                                        if (data.errors) {
+                                            // Handle validation errors
+                                            const errorList = document.createElement('ul');
+                                            errorList.className = 'error-messages';
+                                            data.errors.forEach(error => {
+                                                const li = document.createElement('li');
+                                                li.textContent = error;
+                                                errorList.appendChild(li);
+                                            });
+                                            messageContainer.appendChild(errorList);
+                                        }
+                                        else if (data.error) {
+                                            // Handle authentication errors
+                                            messageContainer.innerHTML = data.error;
+                                            messageContainer.className = 'error-message';
+                                            if (data.redirect) {
+                                                const loginLink = document.createElement('a');
+                                                loginLink.href = data.redirect;
+                                                loginLink.textContent = ' Please login here.';
+                                                loginLink.style.marginLeft = '5px';
+                                                messageContainer.appendChild(loginLink);
+                                            }
+                                        }
+                                        else if (data.success) {
+                                            // Success case
+                                            messageContainer.innerHTML = 'Review submitted successfully!';
+                                            messageContainer.className = 'success-message';
+
+                                            // Reset form
+                                            document.getElementById('reviewForm').reset();
+
+                                            // Optionally refresh reviews after a delay
+                                            setTimeout(() => {
+                                                window.location.reload();
+                                            }, 1500);
+                                        }
+                                    } catch (error) {
+                                        console.error('Error:', error);
+                                        messageContainer.innerHTML = 'An unexpected error occurred. Please try again.';
+                                        messageContainer.className = 'error-message';
+                                    }
+                                });
+                            </script>
     </body>
 
     </html>

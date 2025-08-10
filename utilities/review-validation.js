@@ -16,23 +16,19 @@ module.exports = {
         }
 
         if (errors.length > 0) {
-            return res.status(400).json({ errors });
+            if (req.headers['content-type'] === 'application/json') {
+                return res.status(400).json({ errors });
+            }
+            // For non-AJAX requests (though your form will now be AJAX)
+            req.flash('error', errors);
+            return res.redirect('back');
         }
 
-        // Convertir a números los valores que deben ser numéricos
+        // Convert to proper types
         req.body.vehicle_id = parseInt(vehicle_id);
         req.body.rating = parseInt(rating);
         req.body.comment = comment.trim();
 
-        next();
-    },
-
-    checkSession: (req, res, next) => {
-        if (!req.session.account_id) {
-            return res.status(401).json({ 
-                errors: ["You must be logged in to submit a review"] 
-            });
-        }
         next();
     }
 };
