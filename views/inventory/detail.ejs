@@ -1,137 +1,147 @@
 <%- include('../partials/head', { title }) %>
 
     <body>
-        <main class="detail-view">
-            <%- grid %>
-        </main>
+        <div id="wrapper">
+            <main class="detail-view">
+                <%- grid %>
 
-        <hr>
-        <h3>Customer Reviews</h3>
+                    <hr>
+                    <h3>Customer Reviews</h3>
 
-        <% if (reviews && reviews.length> 0) { %>
-            <ul class="reviews-list">
-                <% reviews.forEach(r=> { %>
-                    <li>
-                        <strong>
-                            <%= r.account_firstname %>
-                                <%= r.account_lastname %>
-                        </strong>
-                        <span> - <%= r.rating %> ★</span>
-                        <p>
-                            <%= r.comment %>
-                        </p>
-                        <small>
-                            <%= new Date(r.created_at).toLocaleDateString() %>
-                        </small>
-                    </li>
-                    <% }) %>
-            </ul>
-            <% } else { %>
-                <p>No reviews for this vehicle.</p>
-                <% } %>
-
-                    <h4>Add a Review</h4>
-                    <form id="reviewForm">
-                        <input type="hidden" name="vehicle_id" value="<%= vehicleId %>">
-
-                        <label for="rating">Rating:</label>
-                        <select name="rating" id="rating" required>
-                            <option value="">Select...</option>
-                            <% for (let i=1; i <=5; i++) { %>
-                                <option value="<%= i %>">
-                                    <%= i %>
-                                </option>
-                                <% } %>
-                        </select>
-
-                        <label for="comment">Comment:</label>
-                        <textarea name="comment" id="comment" required></textarea>
-
-                        <button type="submit">Submit Review</button>
-                    </form>
-
-                    <!-- Container for AJAX messages -->
-                    <div id="reviewMessage" class="message-container"></div>
-
-                    <!-- Display server-side errors if any -->
-                    <% if (errors && errors.length> 0) { %>
-                        <ul class="error-messages">
-                            <% errors.forEach(e=> { %>
+                    <% if (reviews && reviews.length> 0) { %>
+                        <ul class="reviews-list">
+                            <% reviews.forEach(r=> { %>
                                 <li>
-                                    <%= e %>
+                                    <strong>
+                                        <%= r.account_firstname %>
+                                            <%= r.account_lastname %>
+                                    </strong>
+                                    <span> - <%= r.rating %> ★</span>
+                                    <p>
+                                        <%= r.comment %>
+                                    </p>
+                                    <small>
+                                        <%= new Date(r.created_at).toLocaleDateString() %>
+                                    </small>
                                 </li>
                                 <% }) %>
                         </ul>
-                        <% } %>
+                        <% } else { %>
+                            <p>No reviews for this vehicle.</p>
+                            <% } %>
 
-                            <script>
-                                document.getElementById('reviewForm').addEventListener('submit', async function (e) {
-                                    e.preventDefault();
+                                <h4>Add a Review</h4>
+                                <form id="reviewForm">
+                                    <input type="hidden" name="vehicle_id" value="<%= vehicleId %>">
 
-                                    const formData = {
-                                        vehicle_id: document.querySelector('input[name="vehicle_id"]').value,
-                                        rating: document.getElementById('rating').value,
-                                        comment: document.getElementById('comment').value
-                                    };
+                                    <div class="form-group">
+                                        <label for="rating">Rating:</label>
+                                        <select name="rating" id="rating" class="form-control" required>
+                                            <option value="">Select...</option>
+                                            <% for (let i=1; i <=5; i++) { %>
+                                                <option value="<%= i %>">
+                                                    <%= i %>
+                                                </option>
+                                                <% } %>
+                                        </select>
+                                    </div>
 
-                                    const messageContainer = document.getElementById('reviewMessage');
-                                    messageContainer.innerHTML = '';
-                                    messageContainer.style.display = 'block';
+                                    <div class="form-group">
+                                        <label for="comment">Comment:</label>
+                                        <textarea name="comment" id="comment" class="form-control" required></textarea>
+                                    </div>
 
-                                    try {
-                                        const response = await fetch('/reviews/add', {
-                                            method: 'POST',
-                                            headers: {
-                                                'Content-Type': 'application/json',
-                                            },
-                                            body: JSON.stringify(formData)
-                                        });
+                                    <button type="submit" class="btn btn-primary"
+                                        style="opacity: 1; color: rgb(255, 255, 255); background-color: rgb(46, 125, 50);">
+                                        Submit Review
+                                    </button>
+                                </form>
 
-                                        const data = await response.json();
+                                <div id="reviewMessage" class="message-container" aria-live="polite"></div>
 
-                                        if (data.errors) {
-                                            // Handle validation errors
-                                            const errorList = document.createElement('ul');
-                                            errorList.className = 'error-messages';
-                                            data.errors.forEach(error => {
-                                                const li = document.createElement('li');
-                                                li.textContent = error;
-                                                errorList.appendChild(li);
-                                            });
-                                            messageContainer.appendChild(errorList);
-                                        }
-                                        else if (data.error) {
-                                            // Handle authentication errors
-                                            messageContainer.innerHTML = data.error;
-                                            messageContainer.className = 'error-message';
-                                            if (data.redirect) {
-                                                const loginLink = document.createElement('a');
-                                                loginLink.href = data.redirect;
-                                                loginLink.textContent = ' Please login here.';
-                                                loginLink.style.marginLeft = '5px';
-                                                messageContainer.appendChild(loginLink);
-                                            }
-                                        }
-                                        else if (data.success) {
-                                            // Success case
-                                            messageContainer.innerHTML = 'Review submitted successfully!';
-                                            messageContainer.className = 'success-message';
+                                <% if (errors && errors.length> 0) { %>
+                                    <ul class="error-messages">
+                                        <% errors.forEach(e=> { %>
+                                            <li>
+                                                <%= e %>
+                                            </li>
+                                            <% }) %>
+                                    </ul>
+                                    <% } %>
+            </main>
+        </div>
 
-                                            // Reset form
-                                            document.getElementById('reviewForm').reset();
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const reviewForm = document.getElementById('reviewForm');
+                const messageContainer = document.getElementById('reviewMessage');
 
-                                            // Optionally refresh reviews after a delay
-                                            setTimeout(() => {
-                                                window.location.reload();
-                                            }, 1500);
-                                        }
-                                    } catch (error) {
-                                        console.error('Error:', error);
-                                        messageContainer.innerHTML = 'An unexpected error occurred. Please try again.';
-                                        messageContainer.className = 'error-message';
-                                    }
-                                });
-                            </script>
+                reviewForm.addEventListener('submit', async function (e) {
+                    e.preventDefault();
+
+                    messageContainer.innerHTML = '';
+                    messageContainer.style.display = 'block';
+                    messageContainer.className = 'message-container';
+
+                    const formData = {
+                        vehicle_id: document.querySelector('input[name="vehicle_id"]').value,
+                        rating: document.getElementById('rating').value,
+                        comment: document.getElementById('comment').value
+                    };
+
+                    try {
+                        const response = await fetch('/reviews/add', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(formData)
+                        });
+
+                        const data = await response.json();
+
+                        if (data.errors) {
+                            const errorList = document.createElement('ul');
+                            errorList.className = 'error-messages';
+                            data.errors.forEach(error => {
+                                const li = document.createElement('li');
+                                li.textContent = error;
+                                errorList.appendChild(li);
+                            });
+                            messageContainer.appendChild(errorList);
+                        }
+                        else if (data.error) {
+                            messageContainer.innerHTML = data.error;
+                            messageContainer.classList.add('error-message');
+
+                            if (data.redirect) {
+                                const loginLink = document.createElement('a');
+                                loginLink.href = data.redirect;
+                                loginLink.textContent = ' Please login here.';
+                                loginLink.style.marginLeft = '5px';
+                                loginLink.style.color = 'inherit';
+                                loginLink.style.textDecoration = 'underline';
+                                messageContainer.appendChild(loginLink);
+                            }
+                        }
+                        else if (data.success) {
+                            messageContainer.innerHTML = 'Review submitted successfully!';
+                            messageContainer.classList.add('success-message');
+
+                            reviewForm.reset();
+
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 1500);
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+                        messageContainer.innerHTML = 'An unexpected error occurred. Please try again.';
+                        messageContainer.classList.add('error-message');
+                    }
+                });
+            });
+        </script>
     </body>
 
     </html>
